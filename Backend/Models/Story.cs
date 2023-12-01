@@ -26,13 +26,14 @@ namespace Backend.Models
         public int Bedrooms { get; set; }
         public int WC { get; set; }
         public bool State { get; set; }
+        public DateTime StartDate { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public string? UserID { get; set; }
         public virtual Catalog? Catalog { get; set; }
         public virtual Package? Package { get; set; }
         [ForeignKey("UserID")]
-        public virtual ApplicationUser User { get; set; }
+        public virtual ApplicationUser? User { get; set; }
         public virtual ICollection<Image> Images { get; set; } = new List<Image>();
     }
 }
