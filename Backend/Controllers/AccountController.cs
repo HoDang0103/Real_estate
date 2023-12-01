@@ -2,6 +2,7 @@
 using Backend.Repository.Authentication.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Policy;
 
 namespace Backend.Controllers
 {
@@ -25,7 +26,7 @@ namespace Backend.Controllers
                 return Ok(result.Succeeded);
             }
 
-            return StatusCode(500);
+            return BadRequest("Username or Email has been registered.");
         }
 
         [HttpPost("Register-Admin")]
@@ -37,7 +38,7 @@ namespace Backend.Controllers
                 return Ok(result.Succeeded);
             }
 
-            return StatusCode(500);
+            return BadRequest("Username or Email has been registered.");
         }
 
         [HttpPost("Login")]
@@ -47,9 +48,12 @@ namespace Backend.Controllers
 
             if (string.IsNullOrEmpty(result))
             {
-                return Unauthorized();
+                return BadRequest("Username or Password incorrect.");
             }
-
+            if (result == "Locked")
+            {
+                return BadRequest("Account is locked.");
+            }
             return Ok(result);
         }
     }

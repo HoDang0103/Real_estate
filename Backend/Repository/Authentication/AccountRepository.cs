@@ -28,44 +28,68 @@ namespace Backend.Repository.Authentication
         public async Task<string> Login(Login model)
         {
             var user = await userManager.FindByNameAsync(model.Username);
-            var passwordValid = await userManager.CheckPasswordAsync(user, model.Password);
 
-            if (user == null || !passwordValid)
+            if (user != null)
             {
-                return string.Empty;
-            }
+                if (!user.LockoutEnabled)
+                {
+                    // User is locked
+                    return "Locked";
+                }
 
-            var authClaims = new List<Claim>
+                var passwordValid = await userManager.CheckPasswordAsync(user, model.Password);
+
+                if (passwordValid)
+                {
+                    var authClaims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, model.Username),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            var userRoles = await userManager.GetRolesAsync(user);
-            foreach (var role in userRoles)
-            {
-                authClaims.Add(new Claim(ClaimTypes.Role, role.ToString()));
+                    var userRoles = await userManager.GetRolesAsync(user);
+                    foreach (var role in userRoles)
+                    {
+                        authClaims.Add(new Claim(ClaimTypes.Role, role.ToString()));
+                    }
+
+                    var authenKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]));
+
+                    var token = new JwtSecurityToken(
+                        issuer: configuration["JWT:ValidIssuer"],
+                        audience: configuration["JWT:ValidAudience"],
+                        expires: DateTime.Now.AddMinutes(30),
+                        claims: authClaims,
+                        signingCredentials: new SigningCredentials(authenKey, SecurityAlgorithms.HmacSha512Signature)
+                    );
+
+                    return new JwtSecurityTokenHandler().WriteToken(token);
+                }
+                else
+                {
+                    // Incorrect username or password
+                    return string.Empty;
+                }
             }
 
-            var authenKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]));
-
-            var token = new JwtSecurityToken(
-                issuer: configuration["JWT:ValidIssuer"],
-                audience: configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddMinutes(30),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authenKey, SecurityAlgorithms.HmacSha512Signature)
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            // User not found
+            return string.Empty;
         }
 
         public async Task<IdentityResult> RegisterUser(Register model)
         {
+            var userExist = await userManager.FindByNameAsync(model.Username);
+            var emailExist = await userManager.FindByEmailAsync(model.Email);
+            if (userExist != null || emailExist != null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "Username or Email has been registered." });
+            }
             var user = new ApplicationUser
             {
                 Email = model.Email,
-                UserName = model.Username
+                UserName = model.Username,
+                Promotion = 40000,
+                TypeAccount = "Basic"
             };
 
             var result = await userManager.CreateAsync(user, model.Password);
