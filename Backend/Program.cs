@@ -2,6 +2,7 @@ using Backend.Models;
 using Backend.Repository.Authentication;
 using Backend.Repository.Catalog;
 using Backend.Repository.Package;
+using Backend.Repository.Transaction;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -57,7 +58,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => {
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ICatalogRepository, CatalogRepository>();
 builder.Services.AddScoped<IPackageRepository, PackageRepository>();
-
+builder.Services.AddScoped<ITopUpRepository, TopUpRepository>();
 
 //Add JWT
 builder.Services.AddAuthentication(options => {

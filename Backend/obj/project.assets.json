@@ -2186,6 +2186,27 @@
           "lib/netstandard2.0/NuGet.Versioning.dll": {}
         }
       },
+      "PayPalCheckoutSdk.DotNet6/1.0.2": {
+        "type": "package",
+        "dependencies": {
+          "PayPalHttpRequest.DotNet6": "1.0.2"
+        },
+        "compile": {
+          "lib/net6.0/PayPalCheckoutSdk.DotNet6.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/PayPalCheckoutSdk.DotNet6.dll": {}
+        }
+      },
+      "PayPalHttpRequest.DotNet6/1.0.2": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/PayPalHttpRequest.DotNet6.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/PayPalHttpRequest.DotNet6.dll": {}
+        }
+      },
       "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
         "type": "package",
         "runtimeTargets": {
@@ -7264,6 +7285,30 @@
         "nuget.versioning.nuspec"
       ]
     },
+    "PayPalCheckoutSdk.DotNet6/1.0.2": {
+      "sha512": "0t/TNDWqwX371P2qOxlzSu0Rr8bTt1P9JBOQe90jCbEDpGj2etDqD0iVmlHFjlkrYQkDNrADU8sdlhtk7XWCEw==",
+      "type": "package",
+      "path": "paypalcheckoutsdk.dotnet6/1.0.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net6.0/PayPalCheckoutSdk.DotNet6.dll",
+        "paypalcheckoutsdk.dotnet6.1.0.2.nupkg.sha512",
+        "paypalcheckoutsdk.dotnet6.nuspec"
+      ]
+    },
+    "PayPalHttpRequest.DotNet6/1.0.2": {
+      "sha512": "jeFVnWxsbxqb4ogQpqUgXSk3wB1Xd3Rl+MTPII3upzG7kxwk/sf47wN63nesPbRzqndPNY2UiQPbay13kyvC+Q==",
+      "type": "package",
+      "path": "paypalhttprequest.dotnet6/1.0.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net6.0/PayPalHttpRequest.DotNet6.dll",
+        "paypalhttprequest.dotnet6.1.0.2.nupkg.sha512",
+        "paypalhttprequest.dotnet6.nuspec"
+      ]
+    },
     "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
       "sha512": "HdSSp5MnJSsg08KMfZThpuLPJpPwE5hBXvHwoKWosyHHfe8Mh5WKT0ylEOf6yNzX6Ngjxe4Whkafh5q7Ymac4Q==",
       "type": "package",
@@ -11390,6 +11435,7 @@
       "Microsoft.EntityFrameworkCore.SqlServer >= 6.0.25",
       "Microsoft.EntityFrameworkCore.Tools >= 6.0.25",
       "Microsoft.VisualStudio.Web.CodeGeneration.Design >= 6.0.16",
+      "PayPalCheckoutSdk.DotNet6 >= 1.0.2",
       "Swashbuckle.AspNetCore >= 6.5.0"
     ]
   },
@@ -11461,6 +11507,10 @@
           "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
             "target": "Package",
             "version": "[6.0.16, )"
+          },
+          "PayPalCheckoutSdk.DotNet6": {
+            "target": "Package",
+            "version": "[1.0.2, )"
           },
           "Swashbuckle.AspNetCore": {
             "target": "Package",

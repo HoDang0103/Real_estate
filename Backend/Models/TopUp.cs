@@ -6,8 +6,8 @@ namespace Backend.Models
     {
         public int Id { get; set; }
         public string? UserID { get; set; }
-        public decimal AmountTransfer { get; set; }
-        public string? Status { get; set; }
+        public double AmountTransfer { get; set; }
+        public DateTime TransactionDate { get; set; }
 
         [ForeignKey("UserID")]
         public virtual ApplicationUser? User { get; set; }

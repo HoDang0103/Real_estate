@@ -15,6 +15,7 @@
           "Microsoft.EntityFrameworkCore.SqlServer": "6.0.25",
           "Microsoft.EntityFrameworkCore.Tools": "6.0.25",
           "Microsoft.VisualStudio.Web.CodeGeneration.Design": "6.0.16",
+          "PayPalCheckoutSdk.DotNet6": "1.0.2",
           "Swashbuckle.AspNetCore": "6.5.0"
         },
         "runtime": {
@@ -1718,6 +1719,25 @@
           "lib/netstandard2.0/NuGet.Versioning.dll": {
             "assemblyVersion": "6.6.1.2",
             "fileVersion": "6.6.1.2"
+          }
+        }
+      },
+      "PayPalCheckoutSdk.DotNet6/1.0.2": {
+        "dependencies": {
+          "PayPalHttpRequest.DotNet6": "1.0.2"
+        },
+        "runtime": {
+          "lib/net6.0/PayPalCheckoutSdk.DotNet6.dll": {
+            "assemblyVersion": "1.0.2.0",
+            "fileVersion": "1.0.2.0"
+          }
+        }
+      },
+      "PayPalHttpRequest.DotNet6/1.0.2": {
+        "runtime": {
+          "lib/net6.0/PayPalHttpRequest.DotNet6.dll": {
+            "assemblyVersion": "1.0.2.0",
+            "fileVersion": "1.0.2.0"
           }
         }
       },
@@ -3523,6 +3543,20 @@
       "sha512": "sha512-Wm/AOFICTIrCgbVxv9dNWusraTzcggbo5W4ao7hD8NNVq911an9TGwW+uNuYc8I5PkpTeMuSXneV2u6hbi1P4w==",
       "path": "nuget.versioning/6.6.1",
       "hashPath": "nuget.versioning.6.6.1.nupkg.sha512"
+    },
+    "PayPalCheckoutSdk.DotNet6/1.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-0t/TNDWqwX371P2qOxlzSu0Rr8bTt1P9JBOQe90jCbEDpGj2etDqD0iVmlHFjlkrYQkDNrADU8sdlhtk7XWCEw==",
+      "path": "paypalcheckoutsdk.dotnet6/1.0.2",
+      "hashPath": "paypalcheckoutsdk.dotnet6.1.0.2.nupkg.sha512"
+    },
+    "PayPalHttpRequest.DotNet6/1.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-jeFVnWxsbxqb4ogQpqUgXSk3wB1Xd3Rl+MTPII3upzG7kxwk/sf47wN63nesPbRzqndPNY2UiQPbay13kyvC+Q==",
+      "path": "paypalhttprequest.dotnet6/1.0.2",
+      "hashPath": "paypalhttprequest.dotnet6.1.0.2.nupkg.sha512"
     },
     "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
       "type": "package",
