@@ -20,7 +20,7 @@ namespace Backend.Controllers
             _logger = logger;
         }
 
-        [Authorize(Roles ="User")]
+        [Authorize(Roles ="Admin")]
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
