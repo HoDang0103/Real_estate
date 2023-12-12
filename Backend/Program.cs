@@ -1,6 +1,7 @@
 using Backend.Models;
 using Backend.Repository.Authentication;
 using Backend.Repository.Catalog;
+using Backend.Repository.EmailService;
 using Backend.Repository.Package;
 using Backend.Repository.Transaction;
 using Backend.Repository.UserService;
@@ -61,6 +62,7 @@ builder.Services.AddScoped<ICatalogRepository, CatalogRepository>();
 builder.Services.AddScoped<IPackageRepository, PackageRepository>();
 builder.Services.AddScoped<ITopUpRepository, TopUpRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IEmailRepository, EmailRepository>();
 
 //Add JWT
 builder.Services.AddAuthentication(options => {
