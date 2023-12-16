@@ -1,4 +1,5 @@
-﻿using Backend.Mapper;
+﻿using AutoMapper;
+using Backend.Mapper;
 using Backend.Models;
 using Backend.Repository.UserService;
 using Backend.Repository.UserService.Dtos;
@@ -15,11 +16,13 @@ namespace Backend.Controllers
     {
         private readonly IUserRepository _userRepository;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IMapper _mapper;
 
-        public UserController(IUserRepository userRepository, UserManager<ApplicationUser> userManager)
+        public UserController(IUserRepository userRepository, UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             _userRepository = userRepository;
             _userManager = userManager;
+            _mapper = mapper;
         }
 
         [Authorize(Roles = AppRole.Admin)]
@@ -74,6 +77,52 @@ namespace Backend.Controllers
             else
             {
                 return BadRequest(success);
+            }
+        }
+
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("GetAllUsers")]
+        public async Task<IActionResult> GetAllUsers(int page, int pageSize)
+        {
+            try
+            {
+                return Ok(await _userRepository.GetAllUserAsync(page, pageSize));
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+
+        [Authorize]
+        [HttpGet("GetUserBy/{id}")]
+        public async Task<IActionResult> GetUserById(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+            var userDto = _mapper.Map<GetDetailUserDto>(user);
+            return Ok(userDto);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("search")]
+        public async Task<IActionResult> SearchUsers([FromQuery] SearchUserDto searchUser)
+        {
+            try
+            {
+                var usersDto = await _userRepository.SearchUser(searchUser);
+                return Ok(usersDto);
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
     }
