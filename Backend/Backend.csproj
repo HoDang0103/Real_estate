@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <Folder Include="Repository\EmailService\Dtos\" />
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
 </Project>

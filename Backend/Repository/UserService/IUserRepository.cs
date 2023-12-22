@@ -9,5 +9,6 @@ namespace Backend.Repository.UserService
         public Task<List<GetAllUserDto>> GetAllUserAsync(int page, int pageSize);
         public Task<GetDetailUserDto> GetUserAsync(string id);
         public Task<List<GetAllUserDto>> SearchUser (SearchUserDto searchUserDto); 
+        public Task<bool> UpdateUserAsync(string userId, UpdateUserDto model);
     }
 }

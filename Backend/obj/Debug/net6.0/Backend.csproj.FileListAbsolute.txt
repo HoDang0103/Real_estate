@@ -257,3 +257,4 @@ C:\Users\phong\Documents\Year 4\Web_Tech\Real_estate\Backend\bin\Debug\net6.0\ru
 C:\Users\phong\Documents\Year 4\Web_Tech\Real_estate\Backend\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 C:\Users\phong\Documents\Year 4\Web_Tech\Real_estate\Backend\bin\Debug\net6.0\PayPalCheckoutSdk.DotNet6.dll
 C:\Users\phong\Documents\Year 4\Web_Tech\Real_estate\Backend\bin\Debug\net6.0\PayPalHttpRequest.DotNet6.dll
+C:\Users\phong\Documents\Year 4\Web_Tech\Real_estate\Backend\bin\Debug\net6.0\Backend.staticwebassets.runtime.json

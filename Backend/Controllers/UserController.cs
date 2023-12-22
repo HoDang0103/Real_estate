@@ -125,5 +125,27 @@ namespace Backend.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpPut("update/{userId}")]
+        public async Task<IActionResult> UpdateUser(string userId, [FromForm] UpdateUserDto model)
+        {
+            try
+            {
+                var result = await _userRepository.UpdateUserAsync(userId, model);
+
+                if (result)
+                {
+                    return Ok("User updated successfully.");
+                }
+                else
+                {
+                    return NotFound($"User with ID {userId} not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }

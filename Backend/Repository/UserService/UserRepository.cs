@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Backend.Models;
 using Backend.Repository.UserService.Dtos;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,12 +13,14 @@ namespace Backend.Repository.UserService
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public UserRepository(ApplicationDbContext context, IMapper mapper, UserManager<ApplicationUser> userManager) 
+        public UserRepository(ApplicationDbContext context, IMapper mapper, UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             _mapper = mapper;
             _userManager = userManager;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public async Task LockUserAsync(string id, LockUserDto model)
@@ -80,6 +83,50 @@ namespace Backend.Repository.UserService
 
             var users = await query.ToListAsync();
             return _mapper.Map<List<GetAllUserDto>>(users);
+        }
+
+        public async Task<bool> UpdateUserAsync(string userId, UpdateUserDto model)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+
+                if (user == null)
+                {
+                    return false;
+                }
+
+                // Cập nhật thông tin người dùng
+                user.FullName = model.FullName;
+                user.PhoneNumber = model.PhoneNumber;
+
+                // Cập nhật hình ảnh nếu được cung cấp
+                if (model.Image != null && model.Image.Length > 0)
+                {
+                    var uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+                    var extension = Path.GetExtension(model.Image.FileName);
+                    var fileName = $"{DateTime.Now:yyyyMMddHHmmssfff}{extension}";
+                    var filePath = Path.Combine(uploadsFolderPath, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await model.Image.CopyToAsync(stream);
+                    }
+
+                    // Cập nhật đường dẫn hình ảnh vào Image của ApplicationUser
+                    user.Image = $"images/{fileName}";
+                }
+
+                // Lưu lại thông tin người dùng sau khi cập nhật
+                var result = await _userManager.UpdateAsync(user);
+
+                return result.Succeeded;
+            }
+            catch
+            {
+                // Xử lý ngoại lệ hoặc logging
+                return false;
+            }
         }
     }
 }
