@@ -3,6 +3,7 @@ using Backend.Repository.Authentication;
 using Backend.Repository.Catalog;
 using Backend.Repository.EmailService;
 using Backend.Repository.Package;
+using Backend.Repository.StoryService;
 using Backend.Repository.Transaction;
 using Backend.Repository.UserService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -63,6 +64,7 @@ builder.Services.AddScoped<IPackageRepository, PackageRepository>();
 builder.Services.AddScoped<ITopUpRepository, TopUpRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IEmailRepository, EmailRepository>();
+builder.Services.AddScoped<IStoryRepository, StoryRepository>();
 
 //Add JWT
 builder.Services.AddAuthentication(options => {

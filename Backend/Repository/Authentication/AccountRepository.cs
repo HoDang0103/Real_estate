@@ -44,6 +44,7 @@ namespace Backend.Repository.Authentication
                     var authClaims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, model.Username),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 

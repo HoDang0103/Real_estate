@@ -7,7 +7,6 @@ namespace Backend.Repository.Package
     public class PackageRepository : IPackageRepository
     {
         private readonly ApplicationDbContext _context;
-        private readonly IPackageRepository _packageRepository;
 
         public PackageRepository(ApplicationDbContext context)
         {
