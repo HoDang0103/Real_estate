@@ -17,7 +17,10 @@ namespace Backend.Mapper
 
             //Story 
             //CreateMap<CreateStoryDto, Story>().ReverseMap();
-
+            CreateMap<Story, StoryDto>().ReverseMap();
+            CreateMap<Image, ImageDto>().ReverseMap();
+            CreateMap<ApplicationUser, ApplicationUserDto>().ReverseMap();
+            CreateMap<Catalog, CatalogDto>().ReverseMap();
         }
     }
 }

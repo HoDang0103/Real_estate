@@ -1,23 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
-
-namespace Backend.Models
+﻿namespace Backend.Repository.StoryService.Dtos
 {
-    public class Story
+    public class StoryDto
     {
         public int Id { get; set; }
-        public int CatalogID { get; set; }
-        public int PackageID { get; set; }
         public bool Needs { get; set; }
         public string? Title { get; set; }
         public string? Description { get; set; }
         public bool Save { get; set; }
         public int Floor { get; set; }
         public string? Address { get; set; }
-        public string? District { get; set; }
-        public string? Ward { get; set; }
-        public string? Street { get; set; }
-        public string? Project { get; set; }
         public string? Location { get; set; }
         public int Area { get; set; }
         public decimal Price { get; set; }
@@ -29,14 +20,29 @@ namespace Backend.Models
         public bool State { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
         public DateTime EndDate { get; set; }
-        public bool IsActive { get; set; }
-        public string? UserID { get; set; }
-        public virtual Catalog? Catalog { get; set; }
-        public virtual Package? Package { get; set; }
-        [ForeignKey("UserID")]
-        public virtual ApplicationUser? User { get; set; }
-        public virtual ICollection<Image> Images { get; set; } = new List<Image>();
+        public CatalogDto? Catalog { get; set; }
+        public List<ImageDto>? Images { get; set; }
+        public ApplicationUserDto? User { get; set; }
+    }
+
+    public class ImageDto
+    {
+        public int Id { get; set; }
+        public string? ImageLink { get; set; }
+    }
+
+    public class ApplicationUserDto 
+    {
+        public string? Id { get; set; }
+        public string? FullName { get; set; }
+        public string? Email { get; set; }
+        public string? PhoneNumber { get; set; }
+    }
+
+    public class CatalogDto
+    {
+        public int Id { get; set; }
+        public string? CatalogName { get; set; }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using AutoMapper.Configuration.Conventions;
 using Backend.Models;
 using Backend.Repository.StoryService.Dtos;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Backend.Repository.StoryService
 {
@@ -29,6 +31,17 @@ namespace Backend.Repository.StoryService
             {
                 throw new InvalidOperationException($"User not found");
             }
+
+            var package = await _context.Packages.FindAsync(model.PackageID);
+            if (package == null)
+            {
+                throw new InvalidOperationException($"Package not found");
+            }
+            var catagory = await _context.Catalogs.FindAsync(model.CatalogID);
+            if (catagory == null) 
+            {
+                throw new InvalidOperationException($"Catagory not found");
+            }
             var story = new Story
             {
                 CatalogID = model.CatalogID,
@@ -36,13 +49,13 @@ namespace Backend.Repository.StoryService
                 Needs = model.Needs,
                 Title = model.Title,
                 Description = model.Description,
-                Save = model.Save,
+                Save = false,
                 Floor = model.Floor,
-                Address = model.Address,
                 District = model.District,
                 Ward = model.Ward,
                 Street = model.Street,
                 Project = model.Project,
+                Address = model.Project + ", " + model.Street + ", " + model.Ward + ", " + model.District,
                 Location = model.Location,
                 Area = model.Area,
                 Price = model.Price,
@@ -55,6 +68,8 @@ namespace Backend.Repository.StoryService
                 StartDate = model.StartDate,
                 CreatedAt = DateTime.Now, // Thay đổi để sử dụng thời gian hiện tại của server
                 UpdatedAt = DateTime.Now, // Thay đổi để sử dụng thời gian hiện tại của server
+                EndDate = model.StartDate.AddDays(package.NumberDay),
+                IsActive = true,
                 UserID = userID
             };
 
@@ -71,6 +86,21 @@ namespace Backend.Repository.StoryService
 
                     story.Images.Add(image);
                 }
+            }
+
+            // Trừ giá trị từ Package vào Promotion và Surplus
+            if (user.Promotion >= package.PricePerDay * package.NumberDay)
+            {
+                user.Promotion -= package.PricePerDay * package.NumberDay;
+            }
+            else if (user.Surplus >= package.PricePerDay * package.NumberDay)
+            {
+                user.Surplus -= package.PricePerDay * package.NumberDay;
+            }
+            else
+            {
+                // Trả về thông báo lỗi nếu không đủ tiền
+                throw new InvalidOperationException("Tài khoản quý khách không đủ số dư. Vui lòng nạp thêm tiền vào tài khoản");
             }
 
             _context.Stories.Add(story);
@@ -114,9 +144,59 @@ namespace Backend.Repository.StoryService
             return $"/images/{uniqueFileName}";
         }
 
-        public async Task<Story> GetStoryById(int id)
+        public async Task<StoryDto> GetStoryById(int id)
         {
-            return await _context.Stories.FindAsync(id);
+            var story = await _context.Stories
+                 .Include(s => s.Images)
+                 .Include(s => s.User)
+                 .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (story == null)
+            {
+                return null;
+            }
+
+            var storyDto = new StoryDto
+            {
+                Id = story.Id,
+                // Map các thuộc tính khác
+                Images = _mapper.Map<List<ImageDto>>(story.Images),
+                User = _mapper.Map<ApplicationUserDto>(story.User)
+            };
+
+            return storyDto;
+        }
+
+        public async Task<List<StoryDto>> GetAllSaleStorysAsync(int page, int pageSize)
+        {
+            var stories = await _context.Stories
+                .Where(s => s.Needs == true)
+                .Include(s => s.Catalog)
+                .Include(s => s.Images)
+                .Include(s => s.User)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var storyDtos = _mapper.Map<List<Story>, List<StoryDto>>(stories);
+
+            return storyDtos;
+        }
+
+        public async Task<List<StoryDto>> GetAllRentStorysAsync(int page, int pageSize)
+        {
+            var skipAmount = pageSize * (page - 1);
+
+            var stories = await _context.Stories
+                .Where(s => s.Needs == false) // Lọc các câu chuyện có Needs là true
+                .OrderByDescending(s => s.CreatedAt) // Sắp xếp theo CreatedAt giảm dần
+                .Skip(skipAmount)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var storyDtos = _mapper.Map<List<StoryDto>>(stories);
+
+            return storyDtos;
         }
     }
 }

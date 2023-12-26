@@ -77,5 +77,34 @@ namespace Backend.Controllers
             }
         }
 
+        [HttpGet("GetAllSaleStories")]
+        public async Task<IActionResult> GetAllSaleStories(int page, int pageSize)
+        {
+            try
+            {
+                var stories = await _storyRepository.GetAllSaleStorysAsync(page, pageSize);
+
+                return Ok(stories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("GetAllRentStories")]
+        public async Task<IActionResult> GetAllRentStories(int page, int pageSize)
+        {
+            try
+            {
+                var stories = await _storyRepository.GetAllRentStorysAsync(page, pageSize);
+
+                return Ok(stories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }

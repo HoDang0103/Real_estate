@@ -6,6 +6,9 @@ namespace Backend.Repository.StoryService
     public interface IStoryRepository
     {
         public Task<int> CreateStoryAsync(string userID, CreateStoryDto model);
-        public Task<Story> GetStoryById(int id);
+        public Task<StoryDto> GetStoryById(int id);
+        public Task<List<StoryDto>> GetAllSaleStorysAsync(int page, int pageSize);
+        public Task<List<StoryDto>> GetAllRentStorysAsync(int page, int pageSize);
+
     }
 }
