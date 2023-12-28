@@ -21,6 +21,7 @@
         public DateTime StartDate { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime EndDate { get; set; }
+        public PackageDto? Package { get; set; }
         public CatalogDto? Catalog { get; set; }
         public List<ImageDto>? Images { get; set; }
         public ApplicationUserDto? User { get; set; }
@@ -44,5 +45,11 @@
     {
         public int Id { get; set; }
         public string? CatalogName { get; set; }
+    }
+
+    public class PackageDto
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
     }
 }

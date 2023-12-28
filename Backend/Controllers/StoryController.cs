@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Identity;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 
 namespace Backend.Controllers
 {
@@ -18,11 +20,13 @@ namespace Backend.Controllers
     {
         private readonly IStoryRepository _storyRepository;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public StoryController(IStoryRepository storyRepository, UserManager<ApplicationUser> userManager)
+        public StoryController(IStoryRepository storyRepository, UserManager<ApplicationUser> userManager, IWebHostEnvironment webHostEnvironment)
         {
             _storyRepository = storyRepository;
             _userManager = userManager;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [HttpPost("create")]
@@ -98,6 +102,161 @@ namespace Backend.Controllers
             try
             {
                 var stories = await _storyRepository.GetAllRentStorysAsync(page, pageSize);
+
+                return Ok(stories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("GetAllSaleStoriesByCatagoryName")]
+        public async Task<IActionResult> GetAllStoriesByCatagory(string catalogyName, int page, int pageSize)
+        {
+            try
+            {
+                var stories = await _storyRepository.GetAllSaleStorysByCatalogAsync(catalogyName, page, pageSize);
+
+                return Ok(stories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("GetAllRentStoriesByCatagoryName")]
+        public async Task<IActionResult> GetAllRentStoriesByCatagory(string catalogyName, int page, int pageSize)
+        {
+            try
+            {
+                var stories = await _storyRepository.GetAllRentStorysByCatalogAsync(catalogyName, page, pageSize);
+
+                return Ok(stories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("GetAllStoryCurrentUser")]
+        public async Task<IActionResult> GetAllStoryCurrentUser()
+        {
+            try
+            {
+                var userId = _userManager.GetUserId(HttpContext.User);
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return BadRequest("User Not Found");
+                }
+
+                // Gọi phương thức mới trong repository để lấy tất cả các câu chuyện của người dùng hiện tại
+                var stories = await _storyRepository.GetAllStorysByUserIdAsync(userId);
+
+                return Ok(stories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("SearchSaleStory")]
+        public async Task<IActionResult> SearchStories([FromQuery] SearchStoryDto searchDto, int page, int pageSize)
+        {
+            try
+            {
+                var filteredStories = await _storyRepository.SearchSaleStoriesAsync(searchDto, page, pageSize);
+
+                return Ok(filteredStories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("SearchRentStory")]
+        public async Task<IActionResult> SearchRentStories([FromQuery] SearchStoryDto searchDto, int page, int pageSize)
+        {
+            try
+            {
+                var filteredStories = await _storyRepository.SearchRentStoriesAsync(searchDto, page, pageSize);
+
+                return Ok(filteredStories);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [Authorize]
+        [HttpPost("Repost/{id}")]
+        public async Task<IActionResult> RepostStory(int id, [FromBody] RepostStoryDto repostDto)
+        {
+            try
+            {
+                string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var result = await _storyRepository.RepostStoryAsync(userId, id, repostDto);
+
+                switch (result)
+                {
+                    case "NotFound":
+                        return NotFound("Story not found.");
+                    case "NoMoney":
+                        return BadRequest("Tài khoản của quý khách không đủ số dư. Vui lòng nạp thêm tiền vào tài khoản để tiếp tục.");
+                    case "Unauthorized":
+                        return Unauthorized("Bạn không có quyền đăng lại tin này.");
+                    case "Success":
+                        return Ok("Story reposted successfully.");
+                    default:
+                        return BadRequest("Invalid Information.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteStory(int id)
+        {
+            try
+            {
+                var result = await _storyRepository.DeleteStoryAsync(id);
+
+                return result switch
+                {
+                    "NotFound" => NotFound("Story not found."),
+                    "Success" => Ok("Story deleted successfully."),
+                    _ => BadRequest("Invalid Information.")
+                };
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("GetAllExpiredStoryCurrentUser")]
+        public async Task<IActionResult> GetAllExpiredStoryCurrentUser()
+        {
+            try
+            {
+                var userId = _userManager.GetUserId(HttpContext.User);
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return BadRequest("User Not Found");
+                }
+
+                // Gọi phương thức mới trong repository để lấy tất cả các câu chuyện của người dùng hiện tại
+                var stories = await _storyRepository.GetExpiredStoriesCurrentUserAsync(userId);
 
                 return Ok(stories);
             }

@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using AutoMapper.Configuration.Conventions;
 using Backend.Models;
 using Backend.Repository.StoryService.Dtos;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Backend.Repository.StoryService
 {
@@ -65,7 +65,7 @@ namespace Backend.Repository.StoryService
                 Bedrooms = model.Bedrooms,
                 WC = model.WC,
                 State = model.State,
-                StartDate = model.StartDate,
+                StartDate = DateTime.Now,
                 CreatedAt = DateTime.Now, // Thay đổi để sử dụng thời gian hiện tại của server
                 UpdatedAt = DateTime.Now, // Thay đổi để sử dụng thời gian hiện tại của server
                 EndDate = model.StartDate.AddDays(package.NumberDay),
@@ -159,7 +159,22 @@ namespace Backend.Repository.StoryService
             var storyDto = new StoryDto
             {
                 Id = story.Id,
-                // Map các thuộc tính khác
+                Needs = story.Needs,
+                Title = story.Title,
+                Description = story.Description,
+                Floor = story.Floor,
+                Address = story.Address,
+                Area = story.Area,
+                Price = story.Price,
+                Unit = story.Unit,
+                Document = story.Document,
+                Interior = story.Interior,
+                Bedrooms = story.Bedrooms,
+                WC = story.WC,
+                State = story.State,
+                StartDate = story.StartDate,
+                CreatedAt = story.CreatedAt,
+                EndDate = story.EndDate,
                 Images = _mapper.Map<List<ImageDto>>(story.Images),
                 User = _mapper.Map<ApplicationUserDto>(story.User)
             };
@@ -169,11 +184,18 @@ namespace Backend.Repository.StoryService
 
         public async Task<List<StoryDto>> GetAllSaleStorysAsync(int page, int pageSize)
         {
+            var currentDate = DateTime.Now;
             var stories = await _context.Stories
-                .Where(s => s.Needs == true)
+                .Where(s => s.Needs == true && s.EndDate > currentDate)
                 .Include(s => s.Catalog)
                 .Include(s => s.Images)
                 .Include(s => s.User)
+                .Include(s => s.Package)
+                .OrderBy(s => s.Package.Name == "Diamond" ? 1 :
+                       s.Package.Name == "Gold" ? 2 :
+                       s.Package.Name == "Silver" ? 3 :
+                       s.Package.Name == "Basic" ? 4 :
+                       s.Package.Name == "Free" ? 5 : 6)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -185,15 +207,322 @@ namespace Backend.Repository.StoryService
 
         public async Task<List<StoryDto>> GetAllRentStorysAsync(int page, int pageSize)
         {
-            var skipAmount = pageSize * (page - 1);
-
+            var currentDate = DateTime.Now;
             var stories = await _context.Stories
-                .Where(s => s.Needs == false) // Lọc các câu chuyện có Needs là true
-                .OrderByDescending(s => s.CreatedAt) // Sắp xếp theo CreatedAt giảm dần
-                .Skip(skipAmount)
+                .Where(s => s.Needs == false && s.EndDate > currentDate)
+                .Include(s => s.Catalog)
+                .Include(s => s.Images)
+                .Include(s => s.User)
+                .Include(s => s.Package)
+                .OrderBy(s => s.Package.Name == "Diamond" ? 1 :
+                       s.Package.Name == "Gold" ? 2 :
+                       s.Package.Name == "Silver" ? 3 :
+                       s.Package.Name == "Basic" ? 4 :
+                       s.Package.Name == "Free" ? 5 : 6)
+                .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
+            var storyDtos = _mapper.Map<List<Story>, List<StoryDto>>(stories);
+
+            return storyDtos;
+        }
+
+        public async Task<List<StoryDto>> GetAllSaleStorysByCatalogAsync(string catalogName, int page, int pageSize)
+        {
+            var currentDate = DateTime.Now;
+            var stories = await _context.Stories
+                .Where(s => s.Catalog.CatalogName == catalogName && s.Needs == true && s.EndDate > currentDate)
+                .Include(s => s.Catalog)
+                .Include(s => s.Images)
+                .Include(s => s.User)
+                .Include(s => s.Package)
+                .OrderBy(s => s.Package.Name == "Diamond" ? 1 :
+                              s.Package.Name == "Gold" ? 2 :
+                              s.Package.Name == "Silver" ? 3 :
+                              s.Package.Name == "Basic" ? 4 :
+                              s.Package.Name == "Free" ? 5 : 6)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var storyDtos = _mapper.Map<List<Story>, List<StoryDto>>(stories);
+
+            return storyDtos;
+        }
+
+        public async Task<List<StoryDto>> GetAllRentStorysByCatalogAsync(string catalogName, int page, int pageSize)
+        {
+            var currentDate = DateTime.Now;
+            var stories = await _context.Stories
+                .Where(s => s.Catalog.CatalogName == catalogName && s.Needs == false && s.EndDate > currentDate)
+                .Include(s => s.Catalog)
+                .Include(s => s.Images)
+                .Include(s => s.User)
+                .Include(s => s.Package)
+                .OrderBy(s => s.Package.Name == "Diamond" ? 1 :
+                              s.Package.Name == "Gold" ? 2 :
+                              s.Package.Name == "Silver" ? 3 :
+                              s.Package.Name == "Basic" ? 4 :
+                              s.Package.Name == "Free" ? 5 : 6)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var storyDtos = _mapper.Map<List<Story>, List<StoryDto>>(stories);
+
+            return storyDtos;
+        }
+
+        public async Task<List<StoryDto>> GetAllStorysByUserIdAsync(string userId)
+        {
+            // Lấy tất cả câu chuyện của người dùng với ID tương ứng
+            var stories = await _context.Stories
+                .Where(s => s.UserID == userId)
+                .Include(s => s.Catalog)
+                .Include(s => s.Images)
+                .Include(s => s.User)
+                .Include(s => s.Package)
+                .OrderBy(s => s.Package.Name == "Diamond" ? 1 :
+                              s.Package.Name == "Gold" ? 2 :
+                              s.Package.Name == "Silver" ? 3 :
+                              s.Package.Name == "Basic" ? 4 :
+                              s.Package.Name == "Free" ? 5 : 6)
+                .ToListAsync();
+
+            // Map các câu chuyện sang Dto
+            var storyDtos = _mapper.Map<List<StoryDto>>(stories);
+
+            return storyDtos;
+        }
+
+        public async Task<List<StoryDto>> SearchSaleStoriesAsync(SearchStoryDto searchDto, int page, int pageSize)
+        {
+            var currentDate = DateTime.Now;
+            var query = _context.Stories
+                .Where(s => s.Needs == true && s.EndDate > currentDate)
+                .Include(s => s.Catalog)
+                .Include(s => s.Images)
+                .Include(s => s.User)
+                .Include(s => s.Package)
+                .OrderBy(s => s.Package.Name == "Diamond" ? 1 :
+                              s.Package.Name == "Gold" ? 2 :
+                              s.Package.Name == "Silver" ? 3 :
+                              s.Package.Name == "Basic" ? 4 :
+                              s.Package.Name == "Free" ? 5 : 6)
+                .AsQueryable();
+
+            if (searchDto.District != null)
+            {
+                query = query.Where(s => s.District == searchDto.District);
+            }
+
+            if (searchDto.MinPrice != null)
+            {
+                query = query.Where(s => s.Price >= searchDto.MinPrice);
+            }
+
+            if (searchDto.MaxPrice != null)
+            {
+                query = query.Where(s => s.Price <= searchDto.MaxPrice);
+            }
+
+            if (searchDto.MinArea != null)
+            {
+                query = query.Where(s => s.Area >= searchDto.MinArea);
+            }
+
+            if (searchDto.MaxArea != null)
+            {
+                query = query.Where(s => s.Area <= searchDto.MaxArea);
+            }
+
+            if (searchDto.Title != null)
+            {
+                query = query.Where(s => s.Title.Contains(searchDto.Title));
+            }
+
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            var pagedQuery = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            var filteredStories = await pagedQuery.ToListAsync();
+            var storyDtos = _mapper.Map<List<Story>, List<StoryDto>>(filteredStories);
+
+            return storyDtos;
+        }
+
+        public async Task<List<StoryDto>> SearchRentStoriesAsync(SearchStoryDto searchDto, int page, int pageSize)
+        {
+            var currentDate = DateTime.Now;
+            var query = _context.Stories
+                .Where(s => s.Needs == false && s.EndDate > currentDate)
+                .Include(s => s.Catalog)
+                .Include(s => s.Images)
+                .Include(s => s.User)
+                .Include(s => s.Package)
+                .OrderBy(s => s.Package.Name == "Diamond" ? 1 :
+                              s.Package.Name == "Gold" ? 2 :
+                              s.Package.Name == "Silver" ? 3 :
+                              s.Package.Name == "Basic" ? 4 :
+                              s.Package.Name == "Free" ? 5 : 6)
+                .AsQueryable();
+
+            if (searchDto.District != null)
+            {
+                query = query.Where(s => s.District == searchDto.District);
+            }
+
+            if (searchDto.MinPrice != null)
+            {
+                query = query.Where(s => s.Price >= searchDto.MinPrice);
+            }
+
+            if (searchDto.MaxPrice != null)
+            {
+                query = query.Where(s => s.Price <= searchDto.MaxPrice);
+            }
+
+            if (searchDto.MinArea != null)
+            {
+                query = query.Where(s => s.Area >= searchDto.MinArea);
+            }
+
+            if (searchDto.MaxArea != null)
+            {
+                query = query.Where(s => s.Area <= searchDto.MaxArea);
+            }
+
+            if (searchDto.Title != null)
+            {
+                query = query.Where(s => s.Title.Contains(searchDto.Title));
+            }
+
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            var pagedQuery = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            var filteredStories = await pagedQuery.ToListAsync();
+            var storyDtos = _mapper.Map<List<Story>, List<StoryDto>>(filteredStories);
+
+            return storyDtos;
+        }
+
+        public async Task<string> RepostStoryAsync(string userId, int storyId, RepostStoryDto repostDto)
+        {
+            try
+            {
+                var story = await _context.Stories
+                    .Include(s => s.Package)
+                    .Include(s => s.User)
+                    .FirstOrDefaultAsync(s => s.Id == storyId);
+
+                if (story == null)
+                {
+                    return "NotFound";
+                }
+
+                // Chỉ cho phép chỉnh sửa PackageID và StartDate
+                story.PackageID = repostDto.PackageID;
+                story.StartDate = repostDto.StartDate;
+
+                if (!IsValidRepost(story))
+                {
+                    return "Fail";
+                }
+
+                // Kiểm tra xem người đăng lại có đúng là chủ sở hữu của câu chuyện hay không
+                if (story.UserID != userId)
+                {
+                    return "Unauthorized";
+                }
+
+                // Tính toán lại EndDate dựa trên StartDate và NumberDay
+                story.EndDate = story.StartDate.AddDays(story.Package.NumberDay);
+
+                // Tính toán số tiền bị trừ
+                decimal deductionAmount = story.Package.PricePerDay * story.Package.NumberDay;
+
+                // Kiểm tra và trừ tiền từ tài khoản Promotion hoặc Surplus
+                if (TryDeductMoney(story.User, deductionAmount))
+                {
+                    await _context.SaveChangesAsync();
+                    return "Success";
+                }
+
+                return "NoMoney";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        private bool IsValidRepost(Story story)
+        {
+            return story.Package != null && story.User != null && story.Package.NumberDay > 0;
+        }
+
+        private bool TryDeductMoney(ApplicationUser user, decimal amount)
+        {
+            if (user.Promotion >= amount)
+            {
+                user.Promotion -= amount;
+                return true;
+            }
+
+            if (user.Surplus >= amount)
+            {
+                user.Surplus -= amount;
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<string> DeleteStoryAsync(int storyId)
+        {
+            try
+            {
+                var story = await _context.Stories
+                    .Include(s => s.Images)
+                    .FirstOrDefaultAsync(s => s.Id == storyId);
+
+                if (story == null)
+                {
+                    return "NotFound";
+                }
+
+                // Xóa hình ảnh liên quan đến câu chuyện
+                _context.Images.RemoveRange(story.Images);
+
+                // Xóa câu chuyện
+                _context.Stories.Remove(story);
+
+                await _context.SaveChangesAsync();
+
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<StoryDto>> GetExpiredStoriesCurrentUserAsync(string userId)
+        {
+            var currentDate = DateTime.Now;
+            var stories = await _context.Stories
+                .Where(s => s.UserID == userId && s.EndDate < currentDate)
+                .Include(s => s.Catalog)
+                .Include(s => s.Images)
+                .Include(s => s.User)
+                .Include(s => s.Package)
+                .ToListAsync();
+
+            // Map các câu chuyện sang Dto
             var storyDtos = _mapper.Map<List<StoryDto>>(stories);
 
             return storyDtos;

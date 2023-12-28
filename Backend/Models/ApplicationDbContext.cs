@@ -22,11 +22,12 @@ namespace Backend.Models
             base.OnModelCreating(builder);
 
             // Add your own model configurations here.
-         builder.Entity<ApplicationUser>()
-             .HasMany(u => u.Stories)
-             .WithOne(s => s.User)
-             .HasForeignKey(s => s.UserID)
-             .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<ApplicationUser>()
+                .HasMany(u => u.Stories)
+                .WithOne(s => s.User)
+                .HasForeignKey(s => s.UserID)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
             builder.Entity<Story>()
             .HasOne(s => s.Catalog)

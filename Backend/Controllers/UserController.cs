@@ -55,28 +55,35 @@ namespace Backend.Controllers
 
         [Authorize]
         [HttpPut("ChangePassword")]
-        public async Task<IActionResult> ChangePassword(string id, ChangePasswordDto model)
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto model)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
 
-            if (user == null)
-            {
-                return NotFound("User not found.");
-            }
+                if (user == null)
+                {
+                    return BadRequest("User Not Found");
+                }
 
-            if (model.NewPassword != model.ConfirmPassword)
-            {
-                return BadRequest("New password and confirm password do not match.");
-            }
+                if (model.NewPassword != model.ConfirmPassword)
+                {
+                    return BadRequest("New password and confirm password do not match.");
+                }
 
-            var success = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
-            if (success.Succeeded)
-            {
-                return Ok("User updated successfully.");
+                var success = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                if (success.Succeeded)
+                {
+                    return Ok("User updated successfully.");
+                }
+                else
+                {
+                    return BadRequest(success);
+                }
             }
-            else
+            catch (Exception ex) 
             {
-                return BadRequest(success);
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
@@ -126,11 +133,17 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpPut("update/{userId}")]
-        public async Task<IActionResult> UpdateUser(string userId, [FromForm] UpdateUserDto model)
+        [HttpPut("UpdateProfileUser")]
+        public async Task<IActionResult> UpdateUser([FromForm] UpdateUserDto model)
         {
             try
             {
+                var userId = _userManager.GetUserId(User);
+
+                if (userId == null)
+                {
+                    return BadRequest("User Not Found");
+                }
                 var result = await _userRepository.UpdateUserAsync(userId, model);
 
                 if (result)

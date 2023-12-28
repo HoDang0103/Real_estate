@@ -1,6 +1,8 @@
-﻿using Backend.Repository.EmailService;
+﻿using Backend.Models;
+using Backend.Repository.EmailService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -10,27 +12,55 @@ namespace Backend.Controllers
     public class EmailController : ControllerBase
     {
         private readonly IEmailRepository _emailRepository;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public EmailController(IEmailRepository emailRepository)
+        public EmailController(IEmailRepository emailRepository, UserManager<ApplicationUser> userManager)
         {
             _emailRepository = emailRepository;
+            _userManager = userManager;
         }
 
         [Authorize]
         [HttpPost("RefreshPassword")]
-        public async Task<IActionResult> SendEmail(string userEmail)
+        public async Task<IActionResult> SendEmail()
         {
-            var result = await _emailRepository.SendPasswordResetEmailAsync(userEmail);
+            try
+            {
+                // Lấy email của người dùng đang đăng nhập
+                var user = await _userManager.GetUserAsync(User);
 
-            if (result == "Succeed")
-            {
-                return Ok("Password refreshed successfully. Check your email for the new password.");
+                if (user != null)
+                {
+                    var userEmail = await _userManager.GetEmailAsync(user);
+
+                    if (!string.IsNullOrEmpty(userEmail))
+                    {
+                        // Gửi email đặt lại mật khẩu
+                        var result = await _emailRepository.SendPasswordResetEmailAsync(userEmail);
+
+                        if (result == "Succeed")
+                        {
+                            return Ok("Password refreshed successfully. Check your email for the new password.");
+                        }
+                        else
+                        {
+                            return BadRequest("Failed to send the email.");
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest("Email not found.");
+                    }
+                }
+                else
+                {
+                    return BadRequest("User not found.");
+                }
             }
-            if (result == "Fail")
+            catch (Exception ex)
             {
-                return BadRequest("Email not found.");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-            return BadRequest("Failed to send the email.");
         }
 
 

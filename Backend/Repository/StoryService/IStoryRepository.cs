@@ -1,5 +1,5 @@
-﻿using Backend.Models;
-using Backend.Repository.StoryService.Dtos;
+﻿using Backend.Repository.StoryService.Dtos;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Repository.StoryService
 {
@@ -9,6 +9,13 @@ namespace Backend.Repository.StoryService
         public Task<StoryDto> GetStoryById(int id);
         public Task<List<StoryDto>> GetAllSaleStorysAsync(int page, int pageSize);
         public Task<List<StoryDto>> GetAllRentStorysAsync(int page, int pageSize);
-
+        public Task<List<StoryDto>> GetAllSaleStorysByCatalogAsync(string catalogName, int page, int pageSize);
+        public Task<List<StoryDto>> GetAllRentStorysByCatalogAsync(string catalogName, int page, int pageSize);
+        public Task<List<StoryDto>> GetAllStorysByUserIdAsync(string userId);
+        public Task<List<StoryDto>> SearchSaleStoriesAsync(SearchStoryDto searchDto, int page, int pageSize);
+        public Task<List<StoryDto>> SearchRentStoriesAsync(SearchStoryDto searchDto, int page, int pageSize);
+        public Task<string> RepostStoryAsync(string userId, int storyId, RepostStoryDto repostDto);
+        public Task<string> DeleteStoryAsync(int storyId);
+        public Task<List<StoryDto>> GetExpiredStoriesCurrentUserAsync(string userId);
     }
 }
