@@ -6,7 +6,7 @@ namespace Backend.Repository.Transaction
 {
     public interface ITopUpRepository
     {
-        Task<string> CreateTopUpTransaction(TopUp model);
+        public Task<string> CreateTopUpTransaction(TopUp model);
         public Task<List<TopUpDto>> GetAllTopUpsAsync(int page, int pageSize);
         public Task<TopUpDto> GetTopUpById(int id);
         public Task<List<TopUp>> GetAllTopUpsByUserId(string userId);

@@ -56,5 +56,20 @@ namespace Backend.Controllers
             }
             return Ok(result);
         }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                await accountRepo.LogOutAsync();
+
+                return Ok("Logout successful");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }

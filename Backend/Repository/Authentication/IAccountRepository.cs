@@ -8,5 +8,6 @@ namespace Backend.Repository.Authentication
         public Task<IdentityResult> RegisterUser(Register model);
         public Task<IdentityResult> RegisterAdmin(Register model);
         public Task<string> Login(Login model);
+        public Task LogOutAsync();
     }
 }

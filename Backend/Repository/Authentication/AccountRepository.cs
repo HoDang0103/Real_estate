@@ -89,6 +89,7 @@ namespace Backend.Repository.Authentication
             {
                 Email = model.Email,
                 UserName = model.Username,
+                FullName = model.FullName,
                 Promotion = 40000,
                 TypeAccount = "Basic"
             };
@@ -129,6 +130,11 @@ namespace Backend.Repository.Authentication
                 await userManager.AddToRoleAsync(user, AppRole.Admin);
             }
             return result;
+        }
+
+        public async Task LogOutAsync()
+        {
+            await signInManager.SignOutAsync();
         }
     }
 }
