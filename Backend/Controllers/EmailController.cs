@@ -40,26 +40,26 @@ namespace Backend.Controllers
 
                         if (result == "Succeed")
                         {
-                            return Ok("Password refreshed successfully. Check your email for the new password.");
+                            return Ok( new { message = "Password refreshed successfully. Check your email for the new password." });
                         }
                         else
                         {
-                            return BadRequest("Failed to send the email.");
+                            return BadRequest( new { message = "Failed to send the email." });
                         }
                     }
                     else
                     {
-                        return BadRequest("Email not found.");
+                        return BadRequest( new { message = "Email not found." });
                     }
                 }
                 else
                 {
-                    return BadRequest("User not found.");
+                    return BadRequest( new { message = "User not found." });
                 }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
         }
 
@@ -70,9 +70,9 @@ namespace Backend.Controllers
             var result = await _emailRepository.SendOTPEmailAsync(userEmail);
             if (string.IsNullOrEmpty(result))
             {
-                return BadRequest("Email not found.");
+                return BadRequest(new { message = "Email not found." });
             }
-            return Ok("OTP sent successfully. Please check your email or phone.");
+            return Ok( new { message = "OTP sent successfully. Please check your email or phone." });
         }
 
 
@@ -82,17 +82,17 @@ namespace Backend.Controllers
             var result = await _emailRepository.VerifyOTPAndResetPasswordAsync(userEmail, enteredOTP, newPassword);
             if (result == "NotFount")
             {
-                return BadRequest("Email not found.");
+                return BadRequest( new { message = "Email not found." });
             }
             if (result == "OTPFail")
             {
-                return BadRequest("Invalid OTP. Please try again.");
+                return BadRequest( new { message = "Invalid OTP. Please try again." });
             }
             if (result == "Success")
             {
-                return Ok("Password reset successful.");
+                return Ok( new { message = "Password reset successful." });
             }
-            return BadRequest("Failed to reset the password. Please try again.");
+            return BadRequest( new { message = "Failed to reset the password. Please try again." });
         }
     }
 }
