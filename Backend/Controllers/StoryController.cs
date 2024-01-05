@@ -206,20 +206,20 @@ namespace Backend.Controllers
                 switch (result)
                 {
                     case "NotFound":
-                        return NotFound("Story not found.");
+                        return NotFound(new { message = "Story not found." });
                     case "NoMoney":
-                        return BadRequest("Tài khoản của quý khách không đủ số dư. Vui lòng nạp thêm tiền vào tài khoản để tiếp tục.");
+                        return BadRequest(new { message = "Tài khoản của quý khách không đủ số dư. Vui lòng nạp thêm tiền vào tài khoản để tiếp tục." });
                     case "Unauthorized":
-                        return Unauthorized("Bạn không có quyền đăng lại tin này.");
+                        return Unauthorized(new { message = "Bạn không có quyền đăng lại tin này." });
                     case "Success":
-                        return Ok("Story reposted successfully.");
+                        return Ok(new { message = "Story reposted successfully." });
                     default:
-                        return BadRequest("Invalid Information.");
+                        return BadRequest(new { message = "Invalid Information." });
                 }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
             }
         }
 
