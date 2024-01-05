@@ -63,22 +63,22 @@ namespace Backend.Controllers
 
                 if (user == null)
                 {
-                    return BadRequest("User Not Found");
+                    return BadRequest(new { message = "User not found" });
                 }
 
                 if (model.NewPassword != model.ConfirmPassword)
                 {
-                    return BadRequest("New password and confirm password do not match.");
+                    return BadRequest(new { message = "New password and confirm password do not match." });
                 }
 
                 var success = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
                 if (success.Succeeded)
                 {
-                    return Ok("User updated successfully.");
+                    return Ok( new { message = "User updated successfully." });
                 }
                 else
                 {
-                    return BadRequest(success);
+                    return BadRequest(new { message = "Error changing password. Please try again." });
                 }
             }
             catch (Exception ex) 

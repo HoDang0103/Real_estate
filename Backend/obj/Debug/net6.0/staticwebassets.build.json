@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "ZyBmlnlm7HItu0Js9SgGO2sxQvd3KgN1yIWTiM6A3kc=",
+  "Hash": "FVftEEJ2Tx4zhS1vDsItvVC8b9dl5liFAuG9cIth5pQ=",
   "Source": "Backend",
   "BasePath": "_content/Backend",
   "Mode": "Default",
@@ -49,6 +49,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\images\\20240104123720895.jpg"
+    },
+    {
+      "Identity": "C:\\Users\\phong\\Documents\\Year 4\\Web_Tech\\Real_estate\\Backend\\wwwroot\\images\\20240105114014947.jpg",
+      "SourceId": "Backend",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\phong\\Documents\\Year 4\\Web_Tech\\Real_estate\\Backend\\wwwroot\\",
+      "BasePath": "_content/Backend",
+      "RelativePath": "images/20240105114014947.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\20240105114014947.jpg"
     },
     {
       "Identity": "C:\\Users\\phong\\Documents\\Year 4\\Web_Tech\\Real_estate\\Backend\\wwwroot\\images\\Capture_20231225222527.PNG",
