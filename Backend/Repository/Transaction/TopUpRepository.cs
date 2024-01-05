@@ -100,7 +100,7 @@ namespace Backend.Repository.Transaction
             },
                 ApplicationContext = new ApplicationContext
                 {
-                    ReturnUrl = "https://localhost:7015/swagger/index.html",
+                    ReturnUrl = "http://localhost:4200/success",
                     CancelUrl = "https://localhost:7015/swagger/index.html"
                 }
             };
@@ -147,6 +147,58 @@ namespace Backend.Repository.Transaction
                 .Include(t => t.User)
                 .Where(t => t.User.Id == userId)
                 .ToListAsync();
+        }
+
+        public Dictionary<DateTime, double> GetRevenueStatisticsByYear(int year)
+        {
+            var allMonths = Enumerable.Range(1, 12);
+
+            var revenueStatistics = _context.TopUps
+                .Where(r => r.TransactionDate.Year == year)
+                .GroupBy(r => new { Year = r.TransactionDate.Year, Month = r.TransactionDate.Month })
+                .Select(g => new
+                {
+                    Date = new DateTime(g.Key.Year, g.Key.Month, 1),
+                    TotalAmount = g.Sum(r => r.AmountTransfer)
+                })
+                .ToDictionary(r => r.Date, r => ConvertToVND(r.TotalAmount));
+
+            var missingMonths = allMonths.Except(revenueStatistics.Select(r => r.Key.Month));
+
+            foreach (var month in missingMonths)
+            {
+                var missingDate = new DateTime(year, month, 1);
+                revenueStatistics[missingDate] = 0;
+            }
+
+            return revenueStatistics;
+        }
+
+        public Dictionary<DateTime, double> GetRevenueStatisticsByMonth(int year, int month)
+        {
+            var daysInMonth = Enumerable.Range(1, DateTime.DaysInMonth(year, month));
+
+            var topUps = _context.TopUps
+                .Where(r => r.TransactionDate.Year == year && r.TransactionDate.Month == month)
+                .ToList();
+
+            var revenueStatistics = daysInMonth
+                .Select(day => new DateTime(year, month, day))
+                .ToDictionary(date => date, date =>
+                {
+                    var totalAmountUSD = topUps
+                        .Where(r => r.TransactionDate.Day == date.Day)
+                        .Sum(r => r.AmountTransfer);
+
+                    return ConvertToVND(totalAmountUSD);
+                });
+
+            return revenueStatistics;
+        }
+        private double ConvertToVND(double amountUSD)
+        {
+            var exchangeRate = 25000; // Tỷ giá chuyển đổi từ USD sang VND
+            return amountUSD * exchangeRate;
         }
     }
 }

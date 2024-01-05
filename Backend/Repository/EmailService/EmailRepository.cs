@@ -22,7 +22,7 @@ namespace Backend.Repository.EmailService
             //Fill email and Password
             var senderEmail = "20520272@gm.uit.edu.vn";
             var senderName = "REAL ESTATE WEBSITE";
-            var senderPassword = "";
+            var senderPassword = "1017781747";
             var smtpServer = "smtp.gmail.com";
             var smtpPort = 587;
             var enableSsl = true;
@@ -88,7 +88,7 @@ namespace Backend.Repository.EmailService
             //Fill email and password
             var senderEmail = "20520272@gm.uit.edu.vn";
             var senderName = "ABC";
-            var senderPassword = "";
+            var senderPassword = "1017781747";
             var smtpServer = "smtp.gmail.com";
             var smtpPort = 587;
             var enableSsl = true;

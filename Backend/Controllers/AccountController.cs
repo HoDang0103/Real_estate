@@ -46,11 +46,11 @@ namespace Backend.Controllers
         {
             var result = await accountRepo.Login(signInModel);
 
-            if (string.IsNullOrEmpty(result))
+            if (string.IsNullOrEmpty(result.Token))
             {
                 return BadRequest("Username or Password incorrect.");
             }
-            if (result == "Locked")
+            if (result.Status == "Locked")
             {
                 return BadRequest("Account is locked.");
             }

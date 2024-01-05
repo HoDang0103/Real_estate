@@ -19,7 +19,7 @@ namespace Backend.Repository.Authentication.Dtos
 
         [Required(ErrorMessage = "Phone is required")]
         [RegularExpression(@"^\d{10}$", ErrorMessage = "Phone must be 10 digits")]
-        public string? Phone { get; set; }
+        public string? PhoneNumber { get; set; }
 
         [Required(ErrorMessage = "FullName is required")]
         public string? FullName { get; set; }

@@ -25,7 +25,7 @@ namespace Backend.Repository.Authentication
 
         }
 
-        public async Task<string> Login(Login model)
+        public async Task<TokenResponse> Login(Login model)
         {
             var user = await userManager.FindByNameAsync(model.Username);
 
@@ -34,7 +34,7 @@ namespace Backend.Repository.Authentication
                 if (!user.LockoutEnabled)
                 {
                     // User is locked
-                    return "Locked";
+                    return new TokenResponse { Status = "Locked" };
                 }
 
                 var passwordValid = await userManager.CheckPasswordAsync(user, model.Password);
@@ -64,17 +64,23 @@ namespace Backend.Repository.Authentication
                         signingCredentials: new SigningCredentials(authenKey, SecurityAlgorithms.HmacSha512Signature)
                     );
 
-                    return new JwtSecurityTokenHandler().WriteToken(token);
+                    return new TokenResponse
+                    {
+                        Token = new JwtSecurityTokenHandler().WriteToken(token),
+                        Expiry = token.ValidTo,
+                        UserId = user.Id,
+                        Status = "Success"
+                    };
                 }
                 else
                 {
                     // Incorrect username or password
-                    return string.Empty;
+                    return new TokenResponse { Token = string.Empty };
                 }
             }
 
             // User not found
-            return string.Empty;
+            return new TokenResponse { Token = string.Empty };
         }
 
         public async Task<IdentityResult> RegisterUser(Register model)
@@ -91,6 +97,7 @@ namespace Backend.Repository.Authentication
                 UserName = model.Username,
                 FullName = model.FullName,
                 Promotion = 40000,
+                PhoneNumber = model.PhoneNumber,
                 TypeAccount = "Basic"
             };
 

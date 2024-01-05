@@ -144,11 +144,14 @@ namespace Backend.Controllers
                 {
                     return BadRequest("User Not Found");
                 }
-                var result = await _userRepository.UpdateUserAsync(userId, model);
 
-                if (result)
+                // Updated to return the updated user information
+                var updatedUser = await _userRepository.UpdateUserAsync(userId, model);
+
+                if (updatedUser != null)
                 {
-                    return Ok("User updated successfully.");
+                    // Return the updated user information
+                    return Ok(updatedUser);
                 }
                 else
                 {
@@ -158,6 +161,26 @@ namespace Backend.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("GetCurrentUser")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            try
+            {
+                var user = _userManager.GetUserId(User);
+                var result = await _userRepository.GetCurrentUserAsync(user);
+                if (result != null)
+                {
+                    return Ok(result);
+                }
+                return NotFound();
+            }
+            catch(Exception ex)
+            {
+                return BadRequest();
             }
         }
     }

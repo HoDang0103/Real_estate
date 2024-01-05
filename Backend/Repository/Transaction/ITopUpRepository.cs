@@ -10,7 +10,8 @@ namespace Backend.Repository.Transaction
         public Task<List<TopUpDto>> GetAllTopUpsAsync(int page, int pageSize);
         public Task<TopUpDto> GetTopUpById(int id);
         public Task<List<TopUp>> GetAllTopUpsByUserId(string userId);
-
+        public Dictionary<DateTime, double> GetRevenueStatisticsByYear(int year);
+        public Dictionary<DateTime, double> GetRevenueStatisticsByMonth(int year, int month);
 
     }
 }

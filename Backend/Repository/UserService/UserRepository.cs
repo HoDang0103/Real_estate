@@ -85,7 +85,7 @@ namespace Backend.Repository.UserService
             return _mapper.Map<List<GetAllUserDto>>(users);
         }
 
-        public async Task<bool> UpdateUserAsync(string userId, UpdateUserDto model)
+        public async Task<UpdateUserDto> UpdateUserAsync(string userId, UpdateUserDto model)
         {
             try
             {
@@ -93,7 +93,7 @@ namespace Backend.Repository.UserService
 
                 if (user == null)
                 {
-                    return false;
+                    return null;
                 }
 
                 // Cập nhật thông tin người dùng
@@ -120,13 +120,28 @@ namespace Backend.Repository.UserService
                 // Lưu lại thông tin người dùng sau khi cập nhật
                 var result = await _userManager.UpdateAsync(user);
 
-                return result.Succeeded;
+                if (result.Succeeded)
+                {
+                    return new UpdateUserDto
+                    {
+                        FullName = model.FullName,
+                        PhoneNumber = model.PhoneNumber,
+                        Image = model.Image
+                    };
+                }
+                return null;
             }
             catch
             {
                 // Xử lý ngoại lệ hoặc logging
-                return false;
+                return null;
             }
+        }
+
+        public async Task<GetDetailUserDto> GetCurrentUserAsync(string id)
+        {
+            var users = await _userManager.FindByIdAsync(id);
+            return _mapper.Map<GetDetailUserDto>(users);
         }
     }
 }

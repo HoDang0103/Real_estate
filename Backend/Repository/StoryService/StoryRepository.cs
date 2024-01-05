@@ -149,6 +149,8 @@ namespace Backend.Repository.StoryService
             var story = await _context.Stories
                  .Include(s => s.Images)
                  .Include(s => s.User)
+                 .Include(s => s.Package)
+                 .Include(s => s.Catalog)
                  .FirstOrDefaultAsync(s => s.Id == id);
 
             if (story == null)
@@ -176,7 +178,9 @@ namespace Backend.Repository.StoryService
                 CreatedAt = story.CreatedAt,
                 EndDate = story.EndDate,
                 Images = _mapper.Map<List<ImageDto>>(story.Images),
-                User = _mapper.Map<ApplicationUserDto>(story.User)
+                User = _mapper.Map<ApplicationUserDto>(story.User),
+                Package = _mapper.Map<PackageDto>(story.Package),
+                Catalog = _mapper.Map<CatalogDto>(story.Catalog)
             };
 
             return storyDto;

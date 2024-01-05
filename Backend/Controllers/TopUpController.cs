@@ -6,6 +6,7 @@ using Backend.Repository.Transaction.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PayPalCheckoutSdk.Core;
 using PayPalCheckoutSdk.Orders;
 
@@ -124,6 +125,33 @@ namespace Backend.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("get-revenue-statistics/{year}")]
+        public ActionResult<Dictionary<string, double>> GetRevenueStatistics(int year)
+        {
+            var revenueStatistics = _topUpRepository.GetRevenueStatisticsByYear(year)
+                .ToDictionary(
+                    kvp => kvp.Key.ToString("yyyy-MM"),
+                    kvp => kvp.Value
+                );
+
+            return Ok(revenueStatistics);
+        }
+
+        [HttpGet("get-revenue-statistics-month")]
+        public ActionResult<Dictionary<DateTime, double>> GetRevenueStatistics([FromQuery] int year, [FromQuery] int month)
+        {
+            try
+            {
+                var revenueStatistics = _topUpRepository.GetRevenueStatisticsByMonth(year, month);
+                return Ok(revenueStatistics);
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi nếu cần
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
     }
