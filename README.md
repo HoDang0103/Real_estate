@@ -6,7 +6,7 @@
 ### Công nghệ sử dụng <a name="use"></a>
 
 - Backend: .Net Core Web API (JWT, Entity Framework Core, Swagger, Identity,.. )   
-- Frontend: Angular  <a href = "https://github.com/pthanhphong1502/">(Code)</a>
+- Frontend: Angular  <a href = "https://github.com/pthanhphong1502/Frontend">(Code)</a>
 - Database: SQL Server
 
 ### Tính năng chính <a name="main-feature"></a>
